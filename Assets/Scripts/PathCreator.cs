@@ -139,7 +139,7 @@ namespace Bizier {
             return list;
         }
 
-        public bool TryGetClosest(Vector3 point, out float t) {
+        public bool TryGetClosest(Vector3 point, out float t, float treshold = 0.1f, float persistance = 10) {
             var bounds = GetColisionsIndexes(point, collisionErrorType, colisionErrorFactor);
             var segment = 20;
             var factor = 1f / segment;
@@ -163,7 +163,6 @@ namespace Bizier {
                     var dist1 = BizierUtility.GetDistanceToNormal(dir1, pos1, point);
                     var dist2 = BizierUtility.GetDistanceToNormal(dir2, pos2, point);
 
-                    var persistance = 10;
                     if (dist1 >= 0 && dist2 <= 0) {
                         var localFactor = 1f / persistance;
                         for (int g = 0; g <= persistance; g++) {
@@ -181,7 +180,7 @@ namespace Bizier {
                 }
             }
 
-            if (minSegmentIndex < 0) {
+            if (minSegmentIndex < 0 || minDistance <= treshold) {
                 t = 0;
                 return false;
             }

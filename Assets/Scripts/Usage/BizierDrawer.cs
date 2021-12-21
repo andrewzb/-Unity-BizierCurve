@@ -5,6 +5,7 @@ namespace Bizier.Examples{
     [ExecuteAlways]
     public class BizierDrawer :MonoBehaviour {
         [SerializeField] private bool isDrawCurve;
+        [SerializeField] private bool isApplyLoop;
         [SerializeField] private PathCreator pathCreator;
         [SerializeField] private LineRenderer lineRenderer;
         [SerializeField] private int segments;
@@ -21,7 +22,11 @@ namespace Bizier.Examples{
             for (int i = 0; i < pointList.Count; i++) {
                 lineRenderer.SetPosition(i, pointList[i]);
             }
-            lineRenderer.loop = pathCreator.IsClosed;
+            if (isApplyLoop) {
+                lineRenderer.loop = pathCreator.IsClosed;
+            } else {
+                lineRenderer.loop = false;
+            }
         }
 
         public void Clear() {
