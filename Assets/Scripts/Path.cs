@@ -33,6 +33,7 @@ namespace Bizier {
             CalcBound();
         }
 
+
         [SerializeField] private Vector3 offset;
         [SerializeField] private OffsetType offsetType;
         [SerializeField] private Transform transform;
@@ -78,6 +79,48 @@ namespace Bizier {
             return new CurvePointData(pos, forwardDir, normalDir);
         }
 
+        public AnchoreTypes GetAnchoreType(int index) {
+            return anchoreTypes[index];
+        }
+
+        public float GetAnchoreNormal(int i) {
+            return normals[LoopAnchoreIndex(i)];
+        }
+
+        public Vector3[] GetSegmentPoints(int i) {
+            return new Vector3[] {
+            NormalazeToTransformPoint(i * 3),
+            NormalazeToTransformPoint(i * 3 + 1),
+            NormalazeToTransformPoint(i * 3 + 2),
+            NormalazeToTransformPoint(LoopPointIndex(i * 3 + 3))
+        };
+        }
+
+        public bool IsColide(int boundIndex, Vector3 point, CollisionErrorType collisionErrorType, float colisionErrorFactor = 1f) {
+            return BizierUtility.GetIsColide(bounds[boundIndex], point, collisionErrorType, colisionErrorFactor);
+        }
+
+        public int GetCurvePointSegmentIndex(float t, out float segmentT) {
+            var curveLength = lengths.Sum();
+            var length = Mathf.Lerp(0, curveLength, t);
+            var index = 0;
+            var segmentStartLength = 0f;
+            var count = lengths.Count + (isClosed ? 1 : +0);
+            for (int i = 0; i < count; i++) {
+                var currLength = lengths[LoopSegmentIndex(i)];
+                if (length >= segmentStartLength
+                    && length <= (segmentStartLength + currLength) + 0.01f) {
+                    segmentT = (length - segmentStartLength) / currLength;
+                    return i;
+                }
+                segmentStartLength += currLength;
+            }
+
+            segmentT = 0;
+            return index;
+        }
+        
+
         public void UpdateOffset(Vector3 offset) {
             this.offset = offset;
         }
@@ -92,19 +135,11 @@ namespace Bizier {
             }
         }
 
-        public float GetAnchoreNormal(int i) {
-            return normals[LoopAnchoreIndex(i)];
-        }
-
         public void SetAnchoreNormal(int i, float normal) {
             normals[LoopAnchoreIndex(i)] = normal;
         }
 
-        public AnchoreTypes GetAnchoreType(int index) {
-            return anchoreTypes[index];
-        }
-
-        public void NextAnchoreType(int index) {
+        public void SetNextAnchoreType(int index) {
             AnchoreTypes nextType;
             var type = anchoreTypes[index];
             if (type == AnchoreTypes.free) {
@@ -119,6 +154,7 @@ namespace Bizier {
 
         public void SetAproximationCount(int count) {
             aproximationSegmentCount = count;
+            CalculateCurveLength();
         }
 
         public void NormalizeCurve(float controlsLength = 1f) {
@@ -151,6 +187,7 @@ namespace Bizier {
             if (isClosed != localIsClosed) {
                 SetIsClosed(localIsClosed);
             }
+            UpdatePath();
         }
 
         public void AddSegment(Vector3 anchorePos) {
@@ -168,6 +205,7 @@ namespace Bizier {
             if (isClosed != localIsClosed) {
                 SetIsClosed(localIsClosed);
             }
+            UpdatePath();
         }
 
         public void UpdatePoint(int i, Vector3 pos, bool isAlongDir) {
@@ -216,15 +254,7 @@ namespace Bizier {
                     }
                 }
             }
-        }
-
-        public Vector3[] GetSegmentPoints(int i) {
-            return new Vector3[] {
-            NormalazeToTransformPoint(i * 3),
-            NormalazeToTransformPoint(i * 3 + 1),
-            NormalazeToTransformPoint(i * 3 + 2),
-            NormalazeToTransformPoint(LoopPointIndex(i * 3 + 3))
-        };
+            UpdatePath();
         }
 
         public void CenterCurve() {
@@ -241,6 +271,7 @@ namespace Bizier {
             for (int i = 0; i < points.Count; i++) {
                 points[i] -= diff;
             }
+            UpdatePath();
         }
 
         public void RemoveSegment(int i) {
@@ -278,6 +309,7 @@ namespace Bizier {
 
             normals.RemoveAt(i % 3);
             lengths.RemoveAt(i % 3);
+            UpdatePath();
         }
 
         public void ToggleIsClose() {
@@ -303,10 +335,6 @@ namespace Bizier {
             bound = BizierUtility.GetBound(bounds);
         }
 
-        public bool IsColide(int boundIndex, Vector3 point, CollisionErrorType collisionErrorType, float colisionErrorFactor = 1f) {
-            return BizierUtility.GetIsColide(bounds[boundIndex], point, collisionErrorType, colisionErrorFactor);
-        }
-
         public void CalculateCurveLength() {
             lengths.Clear();
             for (int i = 0; i < SegmentCount; i++) {
@@ -316,34 +344,6 @@ namespace Bizier {
                 lengths.Add(length);
             }
         }
-
-        public int GetCurvePointSegmentIndex(float t, out float segmentT) {
-            var curveLength = lengths.Sum();
-            var length = Mathf.Lerp(0, curveLength, t);
-            var index = 0;
-            var segmentStartLength = 0f;
-            var count = lengths.Count + (isClosed ? 1 : +0);
-            for (int i = 0; i < count; i++) {
-                var currLength = lengths[LoopSegmentIndex(i)];
-                if (length >= segmentStartLength
-                    && length <= (segmentStartLength + currLength) + 0.01f) {
-                    segmentT = (length - segmentStartLength) / currLength;
-                    return i;
-                }
-                segmentStartLength += currLength;
-            }
-
-            segmentT = 0;
-            return index;
-        }
-
-        public void UpdatePath() {
-            CalcBound();
-            CalculateCurveLength();
-            UpdateNormals();
-
-        }
-
         private void UpdateNormals() {
             if (SegmentCount != normals.Count) {
                 var localNormals = new List<float>();
@@ -359,6 +359,12 @@ namespace Bizier {
             }
         }
 
+        public void UpdatePath() {
+            CalcBound();
+            CalculateCurveLength();
+            UpdateNormals();
+        }
+
         private void SetIsClosed(bool isClosed) {
             this.isClosed = isClosed;
             if (this.isClosed) {
@@ -367,6 +373,7 @@ namespace Bizier {
             } else {
                 points.RemoveRange(points.Count - 2, 2);
             }
+            UpdatePath();
         }
 
         private int LoopPointIndex(int index) {
@@ -398,7 +405,6 @@ namespace Bizier {
             var m = Matrix4x4.TRS(transform.position + beforeOffset, transform.rotation, transform.lossyScale);
             return m.MultiplyPoint3x4(points[i] + afterOffset);
         }
-
 
         private Vector3 TransformToNormalizePoint(Vector3 point) {
             var beforeOffset = Vector3.zero;

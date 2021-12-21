@@ -205,6 +205,8 @@ namespace Bizier.CustomEditorScripts {
                                 rightDirection, projectedPosition, displaySettings.normalSize);
                             var angleDiff = BizierUtility.GetAngleDiff(startAngle, endAngle);
                             pathCreater.SetAnchoreNormal(i / 3, degree + angleDiff);
+                            isNeedUpdate = true;
+                            SceneView.RepaintAll();
                         }
                     }
                 }
@@ -307,7 +309,7 @@ namespace Bizier.CustomEditorScripts {
             var pointerRay = guiEvent.mousePosition;
             if (guiEvent.type == EventType.MouseDown && guiEvent.button == 0 && guiEvent.alt) {
                 if (TryGetAnchorePoint(pointerRay, out var resultIndex)) {
-                    pathCreater.NextAnchoreType(resultIndex / 3);
+                    pathCreater.SetNextAnchoreType(resultIndex / 3);
                     isNeedUpdate = true;
                     SceneView.RepaintAll();
                 }
@@ -411,7 +413,6 @@ namespace Bizier.CustomEditorScripts {
                 if (localAproximationCount != pathCreater.AproximationCount) {
                     Undo.RecordObject(pathCreater, "Change aproximation Count");
                     pathCreater.SetAproximationCount((int)localAproximationCount);
-                    pathCreater.UpdatePath();
                     isNeedUpdate = true;
                     SceneView.RepaintAll();
                 }

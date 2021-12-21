@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Bizier.Enums;
 using Bizier.Uttils;
@@ -15,6 +16,7 @@ namespace Bizier {
         [SerializeField] private float controlLength;
         [SerializeField] private CollisionErrorType collisionErrorType;
 
+        public Action PathUpdateAction;
 
         public float ColisionErrorFactor => colisionErrorFactor;
         public int AnchoreCount => path.AnchoreCount;
@@ -78,8 +80,8 @@ namespace Bizier {
             return path.GetAnchoreType(index);
         }
 
-        public void NextAnchoreType(int index) {
-            path.NextAnchoreType(index);
+        public void SetNextAnchoreType(int index) {
+            path.SetNextAnchoreType(index);
         }
 
         public void SetAproximationCount(int count) {
@@ -182,7 +184,7 @@ namespace Bizier {
                 }
             }
 
-            if (minSegmentIndex < 0 || minDistance <= treshold) {
+            if (minSegmentIndex < 0 || minDistance >= treshold) {
                 t = 0;
                 return false;
             }
@@ -209,6 +211,7 @@ namespace Bizier {
 
         public void UpdatePath() {
             path.UpdatePath();
+            PathUpdateAction?.Invoke();
         }
 
         public void UpdatePath(Transform transform, bool forceUpdate = false) {
