@@ -7,6 +7,7 @@ namespace Bizier.Structures {
         public PathCreatoreSettings(
             bool isDisplayAnchorPoints,
             bool isDisplayControlPoints,
+            bool isDisplayAnchoreNumber,
             bool isShowPathBounds,
             bool isShowPerSegmentBounds,
             bool isShowPerSegmentColisionBound,
@@ -14,6 +15,7 @@ namespace Bizier.Structures {
             bool isShowNormals) {
             this.isDisplayAnchorPoints = isDisplayAnchorPoints;
             this.isDisplayControlPoints = isDisplayControlPoints;
+            this.isDisplayAnchoreNumber = isDisplayAnchoreNumber;
             this.isShowPathBounds = isShowPathBounds;
             this.isShowPerSegmentBounds = isShowPerSegmentBounds;
             this.isShowPerSegmentColisionBound = isShowPerSegmentColisionBound;
@@ -26,6 +28,9 @@ namespace Bizier.Structures {
 
         [SerializeField] private bool isDisplayControlPoints;
         public bool IsDisplayControlPoints => isDisplayControlPoints;
+
+        [SerializeField] private bool isDisplayAnchoreNumber;
+        public bool IsDisplayAnchoreNumber => isDisplayAnchoreNumber;
 
         [SerializeField] private bool isShowPathBounds;
         public bool IsShowPathBounds => isShowPathBounds;

@@ -23,6 +23,7 @@ namespace Bizier.CustomEditorScripts {
         private bool isShowSelectionRadius;
         private bool isShowColisionError;
         private bool isShowInfo;
+        private bool isShowOffset;
 
         public override void OnInspectorGUI() {
             EditorGUILayout.LabelField($"Curve stats: Segments => {pathCreater.SegmentCount}; " +
@@ -32,6 +33,8 @@ namespace Bizier.CustomEditorScripts {
             DrawInfo();
             EditorGUILayout.Space(5, true);
             DrawToggleIsClose();
+            EditorGUILayout.Space(5, true);
+            DrawOffset();
             EditorGUILayout.Space(5, true);
             DrawActionButtons();
             EditorGUILayout.Space(5, true);
@@ -62,6 +65,7 @@ namespace Bizier.CustomEditorScripts {
             DrawCurveHanles();
             DrawNormalHanles();
             DrawNormals();
+            DrawAnchoreNumber();
 
             if (isNeedUpdate) {
                 pathCreater.UpdatePath();
@@ -239,6 +243,20 @@ namespace Bizier.CustomEditorScripts {
                 }
             }
         }
+
+        private void DrawAnchoreNumber() {
+            if (pathCreater.curveSettings.IsDisplayAnchoreNumber) {
+                var style = new GUIStyle();
+                style.alignment = TextAnchor.MiddleCenter;
+                style.fontSize = displaySettings.anchoreNumberLabelSize;
+                style.normal.textColor = displaySettings.anchoreLabelNumber;
+                for (int i = 0; i < pathCreater.PointsCount; i++) {
+                    if (i % 3 == 0) {
+                        Handles.Label(pathCreater[i], (i / 3).ToString(), style);
+                    }
+                }
+            }
+        }
         #endregion
 
         #region Input
@@ -298,6 +316,25 @@ namespace Bizier.CustomEditorScripts {
         #endregion
 
         #region Inspector
+        private void DrawOffset() {
+            isShowOffset = EditorGUILayout.Foldout(isShowOffset, "Show Offset");
+            if (isShowOffset) {
+                var localOffsetType = (OffsetType)EditorGUILayout.EnumPopup("Offset Type", pathCreater.OffsetType);
+                if (localOffsetType != pathCreater.OffsetType) {
+                    pathCreater.SetOffsetType(localOffsetType);
+                    isNeedUpdate = true;
+                    SceneView.RepaintAll();
+                }
+
+                var localOffset = EditorGUILayout.Vector3Field("Offset", pathCreater.Offset);
+                if (localOffset != pathCreater.Offset) {
+                    pathCreater.UpdateOffset(localOffset);
+                    isNeedUpdate = true;
+                    SceneView.RepaintAll();
+                }
+            }
+        }
+
         private void DrawInfo() {
             isShowInfo = EditorGUILayout.Foldout(isShowInfo, "Show Info");
             if (isShowInfo) {
@@ -311,7 +348,7 @@ namespace Bizier.CustomEditorScripts {
         private void DrawColisionErrorFactor() {
             isShowColisionError = EditorGUILayout.Foldout(isShowColisionError, "Show Collision Error");
             if (isShowColisionError) {
-                var localIsColisionErrorType = (CollisionErrorType)EditorGUILayout.EnumFlagsField(
+                var localIsColisionErrorType = (CollisionErrorType)EditorGUILayout.EnumPopup(
                     "Collision Error Type", pathCreater.CollisionErrorType);
                 if (localIsColisionErrorType != pathCreater.CollisionErrorType) {
                     pathCreater.SetColisionErrorType(localIsColisionErrorType);
@@ -415,7 +452,7 @@ namespace Bizier.CustomEditorScripts {
 
                 if (GUILayout.Button("force Update")) {
                     Undo.RecordObject(pathCreater, "force Update");
-                    pathCreater.UpdatePath();
+                    pathCreater.UpdatePath(pathCreater.transform);
                     isNeedUpdate = true;
                     SceneView.RepaintAll();
                 }
@@ -481,7 +518,7 @@ namespace Bizier.CustomEditorScripts {
             if (!pathCreater.IsPath) {
                 pathCreater.CreatePath();
             }
-
+            pathCreater.UpdatePath(pathCreater.transform);
             LoadDisplaySettings();
         }
     }

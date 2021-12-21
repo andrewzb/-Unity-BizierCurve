@@ -27,6 +27,8 @@ namespace Bizier {
         public int PointsCount => path.PointsCount;
         public int SegmentCount => path.SegmentCount;
         public Vector3 this[int i] => path[i];
+        public Vector3 Offset => path.Offset;
+        public OffsetType OffsetType => path.OffsetType;
         public CollisionErrorType CollisionErrorType => collisionErrorType;
         public bool IsClosed => path.IsClosed;
         public bool IsPath => path != null;
@@ -197,8 +199,21 @@ namespace Bizier {
             return true;
         }
 
+        public void SetOffsetType(OffsetType offsetType) {
+            path.SetOffsetType(offsetType);
+        }
+
+        public void UpdateOffset(Vector3 offset) {
+            path.UpdateOffset(offset);
+        }
+
         public void UpdatePath() {
             path.UpdatePath();
+        }
+
+        public void UpdatePath(Transform transform, bool forceUpdate = false) {
+            path.UpdatePath();
+            path.TryUpdateTransform(transform, forceUpdate);
         }
 
         public void CenterCurve() {

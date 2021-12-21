@@ -33,7 +33,8 @@ namespace Bizier {
             CalcBound();
         }
 
-
+        [SerializeField] private Vector3 offset;
+        [SerializeField] private OffsetType offsetType;
         [SerializeField] private Transform transform;
         [SerializeField] private int aproximationSegmentCount;
         [SerializeField] public List<Vector3> points;
@@ -50,6 +51,8 @@ namespace Bizier {
         public int PointsCount => points.Count;
         public bool IsClosed => isClosed;
         public Vector3 this[int i] => NormalazeToTransformPoint(i);
+        public Vector3 Offset => offset;
+        public OffsetType OffsetType => offsetType;
         public BizierBound GetBound(int index) => bounds[index];
         public float GetLength(int index) => lengths[index];
         public float GetLength(int index, int count) => lengths.GetRange(index, count).Sum();
@@ -73,6 +76,20 @@ namespace Bizier {
             var normalDir = pos + (uoPlaneDir * Mathf.Sin(radAngle))
                 + (rightPlaneDir * Mathf.Cos(radAngle));
             return new CurvePointData(pos, forwardDir, normalDir);
+        }
+
+        public void UpdateOffset(Vector3 offset) {
+            this.offset = offset;
+        }
+
+        public void SetOffsetType(OffsetType offsetType) {
+            this.offsetType = offsetType;
+        }
+
+        public void TryUpdateTransform(Transform transform, bool forceUpdate = false) {
+            if (forceUpdate || this.transform == null) {
+                this.transform = transform;
+            }
         }
 
         public float GetAnchoreNormal(int i) {
@@ -342,7 +359,6 @@ namespace Bizier {
             }
         }
 
-
         private void SetIsClosed(bool isClosed) {
             this.isClosed = isClosed;
             if (this.isClosed) {
@@ -366,15 +382,39 @@ namespace Bizier {
         }
 
         private Vector3 NormalazeToTransformPoint(int i) {
-            var rotation = transform.rotation;
-            var m = Matrix4x4.TRS(transform.position, rotation, transform.lossyScale);
-            return m.MultiplyPoint3x4(points[i]);
+            var beforeOffset = Vector3.zero;
+            var afterOffset = Vector3.zero;
+            switch (offsetType) {
+                case OffsetType.Local:
+                    beforeOffset = offset;
+                break;
+                case OffsetType.Global:
+                    afterOffset = offset;
+                    break;
+                default:
+                break;
+            }
+
+            var m = Matrix4x4.TRS(transform.position + beforeOffset, transform.rotation, transform.lossyScale);
+            return m.MultiplyPoint3x4(points[i] + afterOffset);
         }
 
+
         private Vector3 TransformToNormalizePoint(Vector3 point) {
-            var rotation = transform.rotation;
-            var m = Matrix4x4.TRS(transform.position, rotation, transform.lossyScale).inverse;
-            return m.MultiplyPoint3x4(point);
+            var beforeOffset = Vector3.zero;
+            var afterOffset = Vector3.zero;
+            switch (offsetType) {
+                case OffsetType.Local:
+                beforeOffset = offset;
+                break;
+                case OffsetType.Global:
+                afterOffset = offset;
+                break;
+                default:
+                break;
+            }
+            var m = Matrix4x4.TRS(transform.position - beforeOffset, transform.rotation, transform.lossyScale).inverse;
+            return m.MultiplyPoint3x4(point - afterOffset);
         }
     }
 }

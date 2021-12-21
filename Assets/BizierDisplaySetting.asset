@@ -18,6 +18,7 @@ MonoBehaviour:
   anchoreFree: {r: 1, g: 0.9214889, b: 0, a: 1}
   anchoreSymetric: {r: 1, g: 0.07898478, b: 0, a: 1}
   anchoreSymetricDirection: {r: 1, g: 0, b: 0.6114955, a: 1}
+  anchoreLabelNumber: {r: 0, g: 0, b: 0, a: 1}
   control: {r: 0, g: 1, b: 0.7717738, a: 1}
   controlLine: {r: 0, g: 0, b: 0, a: 1}
   bezierPath: {r: 0.27450982, g: 1, b: 0, a: 1}
@@ -27,6 +28,7 @@ MonoBehaviour:
   normals: {r: 1, g: 0.7293082, b: 0, a: 1}
   normalHandle: {r: 1, g: 0.8217412, b: 0, a: 0.078431375}
   normalLabel: {r: 0, g: 0, b: 0, a: 1}
+  anchoreNumberLabelSize: 18
   LabelFontSize: 18
   normalsLength: 0.1
   normalSegmentPerUnit: 30

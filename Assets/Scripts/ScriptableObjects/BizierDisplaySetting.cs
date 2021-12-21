@@ -9,6 +9,7 @@ namespace Bizier.Assets {
         public Color anchoreFree;
         public Color anchoreSymetric;
         public Color anchoreSymetricDirection;
+        public Color anchoreLabelNumber;
 
         public Color control;
         public Color controlLine;
@@ -23,12 +24,10 @@ namespace Bizier.Assets {
         public Color normalHandle;
         public Color normalLabel;
 
-        [Range(14, 98)]
-        public int LabelFontSize;
-        [Range(0, 1)]
-        public float normalsLength;
-        [Range(1, 50)]
-        public int normalSegmentPerUnit;
+        [Range(14, 98)] public int anchoreNumberLabelSize;
+        [Range(14, 98)] public int LabelFontSize;
+        [Range(0, 1)] public float normalsLength;
+        [Range(1, 50)] public int normalSegmentPerUnit;
 
 #if UNITY_EDITOR
         public static BizierDisplaySetting Load() {
