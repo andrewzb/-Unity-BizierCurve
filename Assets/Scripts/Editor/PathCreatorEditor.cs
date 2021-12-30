@@ -2,7 +2,7 @@
 using UnityEditor;
 using Bizier.Enums;
 using Bizier.Assets;
-using Bizier.Uttils;
+using Bizier.Utils;
 
 namespace Bizier.CustomEditorScripts {
     [CustomEditor(typeof(PathCreator))]
@@ -16,14 +16,6 @@ namespace Bizier.CustomEditorScripts {
         private Quaternion prevTranQuantarion;
 
         private bool isNeedUpdate;
-        private bool isShowDrawSettings;
-        private bool isShowNormalize;
-        private bool isShowAproximationCount;
-        private bool isShowAction;
-        private bool isShowSelectionRadius;
-        private bool isShowColisionError;
-        private bool isShowInfo;
-        private bool isShowOffset;
 
         public override void OnInspectorGUI() {
             EditorGUILayout.LabelField($"Curve stats: Segments => {pathCreater.SegmentCount}; " +
@@ -189,7 +181,7 @@ namespace Bizier.CustomEditorScripts {
 
                         Handles.Label(pathCreater[i], ((int)(degree / 360)).ToString(), style);
 
-                        var handlePos = BizierUtility.GetNormalHandlePosition(
+                        var handlePos = MathHelper.GetNormalHandlePosition(
                             pathCreater[i], upDirection, rightDirection, size, degree);
 
                         Handles.color = displaySettings.anchoreFree;
@@ -197,13 +189,13 @@ namespace Bizier.CustomEditorScripts {
                             Quaternion.identity, 0.01f, Vector3.zero, Handles.SphereHandleCap);
 
                         if (newPos != handlePos) {
-                            var startAngle = BizierUtility.GetAndgle(pathCreater[i], upDirection,
+                            var startAngle = MathHelper.GetAndgle(pathCreater[i], upDirection,
                                 rightDirection, handlePos, displaySettings.normalSize);
-                            var projectedPosition = BizierUtility.GetSnapPosition(
+                            var projectedPosition = MathHelper.GetSnapPosition(
                                 pathCreater[i], direction, newPos, displaySettings.normalSize);
-                            var endAngle = BizierUtility.GetAndgle(pathCreater[i], upDirection,
+                            var endAngle = MathHelper.GetAndgle(pathCreater[i], upDirection,
                                 rightDirection, projectedPosition, displaySettings.normalSize);
-                            var angleDiff = BizierUtility.GetAngleDiff(startAngle, endAngle);
+                            var angleDiff = MathHelper.GetAngleDiff(startAngle, endAngle);
                             pathCreater.SetAnchoreNormal(i / 3, degree + angleDiff);
                             isNeedUpdate = true;
                             SceneView.RepaintAll();
@@ -229,7 +221,7 @@ namespace Bizier.CustomEditorScripts {
                         var pos = BizierUtility.GetBuizierPoint(points, t);
                         var forwardDir = BizierUtility.GetBuizierFirstDerivative(points, t);
                         var upPoint = pos + Vector3.up;
-                        var upDistToPlane = BizierUtility.GetDistanceToNormal(
+                        var upDistToPlane = MathHelper.GetDistanceToNormal(
                             forwardDir, pos, upPoint);
                         var upPlanePoint = upPoint - forwardDir * upDistToPlane;
                         var uoPlaneDir = (upPlanePoint - pos).normalized;
@@ -281,7 +273,7 @@ namespace Bizier.CustomEditorScripts {
             var pointerRay = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);
             var mousePos = pointerRay.origin;
             if (guiEvent.type == EventType.MouseDown && guiEvent.button == 0 && guiEvent.shift && guiEvent.alt) {
-                var dist = BizierUtility.GetDistanceToNormal(
+                var dist = MathHelper.GetDistanceToNormal(
                     -pointerRay.direction, pathCreater.transform.position, mousePos);
                 var newPos = mousePos + pointerRay.direction * dist;
                 Undo.RecordObject(pathCreater, "add new segment");
@@ -319,8 +311,8 @@ namespace Bizier.CustomEditorScripts {
 
         #region Inspector
         private void DrawOffset() {
-            isShowOffset = EditorGUILayout.Foldout(isShowOffset, "Show Offset");
-            if (isShowOffset) {
+            pathCreater.isShowOffset = EditorGUILayout.Foldout(pathCreater.isShowOffset, "Show Offset");
+            if (pathCreater.isShowOffset) {
                 var localOffsetType = (OffsetType)EditorGUILayout.EnumPopup("Offset Type", pathCreater.OffsetType);
                 if (localOffsetType != pathCreater.OffsetType) {
                     pathCreater.SetOffsetType(localOffsetType);
@@ -338,8 +330,8 @@ namespace Bizier.CustomEditorScripts {
         }
 
         private void DrawInfo() {
-            isShowInfo = EditorGUILayout.Foldout(isShowInfo, "Show Info");
-            if (isShowInfo) {
+            pathCreater.isShowInfo = EditorGUILayout.Foldout(pathCreater.isShowInfo, "Show Info");
+            if (pathCreater.isShowInfo) {
                 EditorGUILayout.LabelField($"Add shift + alt + click(LMB)");
                 EditorGUILayout.LabelField($"Remove shift + ctrl + click(LMB)");
                 EditorGUILayout.LabelField($"Change Anchore Type shift + alt + click(LMB)");
@@ -348,8 +340,8 @@ namespace Bizier.CustomEditorScripts {
         }
 
         private void DrawColisionErrorFactor() {
-            isShowColisionError = EditorGUILayout.Foldout(isShowColisionError, "Show Collision Error");
-            if (isShowColisionError) {
+            pathCreater.isShowColisionError = EditorGUILayout.Foldout(pathCreater.isShowColisionError, "Show Collision Error");
+            if (pathCreater.isShowColisionError) {
                 var localIsColisionErrorType = (CollisionErrorType)EditorGUILayout.EnumPopup(
                     "Collision Error Type", pathCreater.CollisionErrorType);
                 if (localIsColisionErrorType != pathCreater.CollisionErrorType) {
@@ -357,8 +349,8 @@ namespace Bizier.CustomEditorScripts {
                     isNeedUpdate = true;
                     SceneView.RepaintAll();
                 }
-                var localColisionErrorFactor = pathCreater.ColisionErrorFactor;
-                localColisionErrorFactor = EditorGUILayout.Slider(pathCreater.ColisionErrorFactor, 0, 2);
+                
+                var localColisionErrorFactor = EditorGUILayout.Slider(pathCreater.ColisionErrorFactor, 0, 2);
 
                 if (localColisionErrorFactor != pathCreater.ColisionErrorFactor) {
                     pathCreater.SetColisionErrorFactor(localColisionErrorFactor);
@@ -369,8 +361,8 @@ namespace Bizier.CustomEditorScripts {
         }
 
         private void DrawSelectionRadius() {
-            isShowSelectionRadius = EditorGUILayout.Foldout(isShowSelectionRadius, "Show Selection Radius");
-            if (isShowSelectionRadius) {
+            pathCreater.isShowSelectionRadius = EditorGUILayout.Foldout(pathCreater.isShowSelectionRadius, "Show Selection Radius");
+            if (pathCreater.isShowSelectionRadius) {
                 var localSelectRadius = EditorGUILayout.Slider(pathCreater.SelectRadius, 10, 100);
                 if (localSelectRadius != pathCreater.SelectRadius) {
                     pathCreater.SetSelectedRadius(localSelectRadius);
@@ -381,8 +373,8 @@ namespace Bizier.CustomEditorScripts {
         }
 
         private void DrawNormalizeCurve() {
-            isShowNormalize = EditorGUILayout.Foldout(isShowNormalize, "Show Normilize Curve");
-            if (isShowNormalize) {
+            pathCreater.isShowNormalize = EditorGUILayout.Foldout(pathCreater.isShowNormalize, "Show Normilize Curve");
+            if (pathCreater.isShowNormalize) {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField($"Controls Length");
                 var localControlLength = EditorGUILayout.Slider(pathCreater.ControlLength, 0.1f, 2);
@@ -405,8 +397,8 @@ namespace Bizier.CustomEditorScripts {
         }
 
         private void DrawAproximationCount() {
-            isShowAproximationCount = EditorGUILayout.Foldout(isShowAproximationCount, "Show Aproximation Count");
-            if (isShowAproximationCount) {
+            pathCreater.isShowAproximationCount = EditorGUILayout.Foldout(pathCreater.isShowAproximationCount, "Show Aproximation Count");
+            if (pathCreater.isShowAproximationCount) {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField($"Aproximation Count");
                 var localAproximationCount = EditorGUILayout.Slider(pathCreater.AproximationCount, 10, 50);
@@ -422,8 +414,8 @@ namespace Bizier.CustomEditorScripts {
 
         private void DrawViewSettings() {
             EditorGUILayout.LabelField($"ViewSettings");
-            isShowDrawSettings = EditorGUILayout.InspectorTitlebar(isShowDrawSettings, displaySettings);
-            if (isShowDrawSettings) {
+            pathCreater.isShowDrawSettings = EditorGUILayout.InspectorTitlebar(pathCreater.isShowDrawSettings, displaySettings);
+            if (pathCreater.isShowDrawSettings) {
                 CreateCachedEditor(displaySettings, null, ref displaySettingsEditor);
                 displaySettingsEditor.OnInspectorGUI();
                 isNeedUpdate = true;
@@ -441,8 +433,8 @@ namespace Bizier.CustomEditorScripts {
         }
 
         private void DrawActionButtons() {
-            isShowAction = EditorGUILayout.Foldout(isShowAction, "Show Actions");
-            if (isShowAction) {
+            pathCreater.isShowAction = EditorGUILayout.Foldout(pathCreater.isShowAction, "Show Actions");
+            if (pathCreater.isShowAction) {
                 EditorGUILayout.BeginHorizontal();
                 if (GUILayout.Button("reset")) {
                     Undo.RecordObject(pathCreater, "reset");

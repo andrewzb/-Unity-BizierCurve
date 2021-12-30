@@ -1,12 +1,23 @@
 using System;
 using UnityEngine;
 using Bizier.Enums;
-using Bizier.Uttils;
+using Bizier.Utils;
 using Bizier.Structures;
 using System.Collections.Generic;
 
 namespace Bizier {
     public class PathCreator :MonoBehaviour {
+        #region
+        [SerializeField] public bool isShowDrawSettings;
+        [SerializeField] public bool isShowNormalize;
+        [SerializeField] public bool isShowAproximationCount;
+        [SerializeField] public bool isShowAction;
+        [SerializeField] public bool isShowSelectionRadius;
+        [SerializeField] public bool isShowColisionError;
+        [SerializeField] public bool isShowInfo;
+        [SerializeField] public bool isShowOffset;
+        #endregion
+
         [SerializeField] public PathCreatoreSettings curveSettings;
         [SerializeField] private Path path;
         [SerializeField] private int aproximationCount;
@@ -120,7 +131,8 @@ namespace Bizier {
             curveSettings = new PathCreatoreSettings();
         }
 
-        public List<int> GetColisionsIndexes(Vector3 point, CollisionErrorType collisionErrorType, float colisionErrorFactor = 1f) {
+        public List<int> GetColisionsIndexes(Vector3 point, CollisionErrorType collisionErrorType,
+        float colisionErrorFactor = 1f) {
             var indexList = new List<int>();
             for (int i = 0; i < path.SegmentCount; i++) {
                 if (path.IsColide(i, point, collisionErrorType, colisionErrorFactor)) {
@@ -143,7 +155,8 @@ namespace Bizier {
             return list;
         }
 
-        public bool TryGetClosest(Vector3 point, out float t, float treshold = 0.1f, float persistance = 10) {
+        public bool TryGetClosest(
+        Vector3 point, out float t, float treshold = 0.1f, float persistance = 10) {
             var bounds = GetColisionsIndexes(point, collisionErrorType, colisionErrorFactor);
             var segment = 20;
             var factor = 1f / segment;
@@ -164,8 +177,8 @@ namespace Bizier {
                     var pos2 = BizierUtility.GetBuizierPoint(points, t2);
                     var dir2 = BizierUtility.GetBuizierFirstDerivative(points, t2);
 
-                    var dist1 = BizierUtility.GetDistanceToNormal(dir1, pos1, point);
-                    var dist2 = BizierUtility.GetDistanceToNormal(dir2, pos2, point);
+                    var dist1 = MathHelper.GetDistanceToNormal(dir1, pos1, point);
+                    var dist2 = MathHelper.GetDistanceToNormal(dir2, pos2, point);
 
                     if (dist1 >= 0 && dist2 <= 0) {
                         var localFactor = 1f / persistance;
@@ -221,6 +234,21 @@ namespace Bizier {
 
         public void CenterCurve() {
             path.CenterCurve();
+        }
+
+        public List<CurvePointData> GetBzizierPointsData(
+        float t, float length, int segments, bool isMiddle = true) {
+            var result = new List<CurvePointData>();
+            var pathLength = path.GetLength(0, path.SegmentCount);
+            var localLength = Mathf.Clamp(length, 0, pathLength);
+            var tDiff = localLength / pathLength;
+            var factor = tDiff / segments;
+            var startT = t - tDiff / 2;
+            for (int i = 0; i <= segments; i++) {
+                var point = path.GetCurvePointData(MathHelper.Loop01(startT + factor * i));
+                result.Add(point);
+            }
+            return result;
         }
     }
 }

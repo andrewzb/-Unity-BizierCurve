@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using Bizier.Structures;
-using Bizier.Uttils;
+using Bizier.Utils;
 using Bizier.Enums;
 
 
@@ -38,13 +38,13 @@ namespace Bizier {
         [SerializeField] private OffsetType offsetType;
         [SerializeField] private Transform transform;
         [SerializeField] private int aproximationSegmentCount;
-        [SerializeField] public List<Vector3> points;
-        [SerializeField] public List<BizierBound> bounds;
-        [SerializeField] public List<float> lengths;
+        [SerializeField] private List<Vector3> points;
+        [SerializeField] private List<float> lengths;
         [SerializeField] private List<AnchoreTypes> anchoreTypes;
-        [SerializeField] public List<float> normals;
-        [SerializeField] public BizierBound bound;
+        [SerializeField] private List<float> normals;
         [SerializeField] private bool isClosed;
+        [SerializeField] public List<BizierBound> bounds;
+        [SerializeField] public BizierBound bound;
 
 
         public int SegmentCount => points.Count / 3;
@@ -67,7 +67,7 @@ namespace Bizier {
             var pos = BizierUtility.GetBuizierPoint(segmentPoints, segmentT);
             var forwardDir = BizierUtility.GetBuizierFirstDerivative(segmentPoints, segmentT);
             var upPoint = pos + Vector3.up;
-            var upDistToPlane = BizierUtility.GetDistanceToNormal(
+            var upDistToPlane = MathHelper.GetDistanceToNormal(
                 forwardDir, pos, upPoint);
             var upPlanePoint = upPoint - forwardDir * upDistToPlane;
             var uoPlaneDir = (upPlanePoint - pos).normalized;

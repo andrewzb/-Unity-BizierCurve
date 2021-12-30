@@ -14,7 +14,7 @@ namespace Bizier.Examples {
         private float currentT;
 
         private void Update() {
-            bizierDrawer.Draw(Mathf.Clamp01(currentT - 0.5f * drawGap), Mathf.Clamp01(currentT + 0.5f * drawGap), 5);
+            //bizierDrawer.Draw(Mathf.Clamp01(currentT - 0.5f * drawGap), Mathf.Clamp01(currentT + 0.5f * drawGap), 5);
 
             if (pathCreator.TryGetClosest(snapAnchore.position, out var t, treshold, segmentPersistance)) {
                 var pointData = pathCreator.GetCurvePointData(t);

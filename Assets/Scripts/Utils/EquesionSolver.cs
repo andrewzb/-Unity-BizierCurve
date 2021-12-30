@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using Bizier.Enums;
 
-namespace Bizier.Uttils {
+namespace Bizier.Utils {
     public static class EquesionSolver {
 
         public static WorkFlowResult TrySolveQuadraticEquesion(
