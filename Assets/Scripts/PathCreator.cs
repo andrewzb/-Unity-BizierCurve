@@ -243,11 +243,16 @@ namespace Bizier {
             var localLength = Mathf.Clamp(length, 0, pathLength);
             var tDiff = localLength / pathLength;
             var factor = tDiff / segments;
-            var startT = t - tDiff / 2;
+            var startT = t;
+            if (isMiddle) {
+                startT = t - tDiff / 2;
+            }
+
             for (int i = 0; i <= segments; i++) {
                 var point = path.GetCurvePointData(MathHelper.Loop01(startT + factor * i));
                 result.Add(point);
             }
+
             return result;
         }
     }
