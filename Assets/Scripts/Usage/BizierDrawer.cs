@@ -72,17 +72,6 @@ namespace Bizier.Examples{
             }
         }
 
-
-
-
-
-
-
-
-
-
-
-
         public void Clear() {
             lineRenderer.positionCount = 0;
         }

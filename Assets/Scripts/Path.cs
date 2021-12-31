@@ -74,9 +74,10 @@ namespace Bizier {
             var rightPlaneDir = (Quaternion.AngleAxis(90, forwardDir) * uoPlaneDir).normalized;
             var degre = Mathf.Lerp(startRotation, endRotation, t);
             var radAngle = Mathf.Deg2Rad * degre;
-            var normalDir = pos + (uoPlaneDir * Mathf.Sin(radAngle))
-                + (rightPlaneDir * Mathf.Cos(radAngle));
-            return new CurvePointData(pos, forwardDir, normalDir);
+            var normalDir = (pos + (uoPlaneDir * Mathf.Sin(radAngle))
+                + (rightPlaneDir * Mathf.Cos(radAngle))).normalized;
+            var right = (rightPlaneDir * Mathf.Cos(radAngle)).normalized;
+            return new CurvePointData(pos, forwardDir, normalDir, right);
         }
 
         public AnchoreTypes GetAnchoreType(int index) {
