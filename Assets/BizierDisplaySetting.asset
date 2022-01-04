@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d2fb70575f95ef418e718d6e4d0b06e, type: 3}
   m_Name: BizierDisplaySetting
   m_EditorClassIdentifier: 
-  anchorSize: 0.03
+  anchorSize: 0.01
   controlSize: 0.03
   normalSize: 0.1
   anchoreFree: {r: 1, g: 0.9214889, b: 0, a: 1}
@@ -30,5 +30,5 @@ MonoBehaviour:
   normalLabel: {r: 0, g: 0, b: 0, a: 1}
   anchoreNumberLabelSize: 18
   LabelFontSize: 18
-  normalsLength: 0.1
+  normalsLength: 0.05
   normalSegmentPerUnit: 30

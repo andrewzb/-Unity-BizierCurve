@@ -519,7 +519,7 @@ MonoBehaviour:
   isShowAction: 0
   isShowSelectionRadius: 0
   isShowColisionError: 0
-  isShowInfo: 1
+  isShowInfo: 0
   isShowOffset: 0
   curveSettings:
     isDisplayAnchorPoints: 1
@@ -528,27 +528,27 @@ MonoBehaviour:
     isShowPathBounds: 0
     isShowPerSegmentBounds: 0
     isShowPerSegmentColisionBound: 0
-    isShowNormalsHandles: 0
-    isShowNormals: 0
+    isShowNormalsHandles: 1
+    isShowNormals: 1
   path:
     offset: {x: 0, y: 0, z: 0}
     offsetType: 1
     transform: {fileID: 443482395}
     aproximationSegmentCount: 33
     points:
-    - {x: -0.6264219, y: -0.26106963, z: 0.13425155}
-    - {x: -0.70133895, y: -0.10722226, z: 0.2893466}
-    - {x: -0.21013525, y: 0.22839355, z: 0.5443115}
-    - {x: -0.039358884, y: 0.20080566, z: 0.44673157}
-    - {x: 0.13141748, y: 0.17321777, z: 0.3491516}
-    - {x: 0.47998926, y: 0.08862305, z: -0.12730408}
-    - {x: 0.3968562, y: -0.0332807, z: -0.23346893}
-    - {x: 0.31372312, y: -0.15518445, z: -0.3396338}
-    - {x: -0.5515049, y: -0.414917, z: -0.020843506}
+    - {x: -0.62384033, y: 0, z: 0.11911011}
+    - {x: -0.7481079, y: 0, z: 0.3031006}
+    - {x: -0.22943115, y: 0, z: 0.5148926}
+    - {x: -0.039358884, y: 0, z: 0.44673157}
+    - {x: 0.15071338, y: 0, z: 0.37857056}
+    - {x: 0.44953513, y: 0, z: -0.070575565}
+    - {x: 0.3968562, y: 0, z: -0.23346893}
+    - {x: 0.34417725, y: 0, z: -0.3963623}
+    - {x: -0.49957275, y: 0, z: -0.06488037}
     lengths:
-    - 0.9020781
-    - 0.8827284
-    - 1.1845675
+    - 0.90721864
+    - 0.881465
+    - 1.168427
     anchoreTypes: 010000000100000001000000
     normals:
     - 0
@@ -556,15 +556,15 @@ MonoBehaviour:
     - 0
     isClosed: 1
     bounds:
-    - center: {x: -0.33674777, y: -0.02933056, z: 0.30131736}
-      size: {x: 0.5947778, y: 0.46347815, z: 0.33413166}
-    - center: {x: 0.18505624, y: 0.08376248, z: 0.106631316}
-      size: {x: 0.44883025, y: 0.23408636, z: 0.6802005}
-    - center: {x: -0.11478287, y: -0.17085725, z: -0.060219042}
-      size: {x: 1.0232781, y: 0.2751531, z: 0.38894117}
+    - center: {x: -0.34110147, y: -0.019651823, z: 0.289454}
+      size: {x: 0.6034851, y: 0.44281304, z: 0.3406878}
+    - center: {x: 0.181814, y: 0.08376248, z: 0.106631316}
+      size: {x: 0.44234577, y: 0.23408636, z: 0.6802005}
+    - center: {x: -0.11349207, y: -0.14219262, z: -0.07903813}
+      size: {x: 1.0206965, y: 0.21782383, z: 0.39629647}
     bound:
-      center: {x: -0.11233266, y: -0.05301264, z: 0.10684678}
-      size: {x: 1.0436081, y: 0.5108423, z: 0.7230728}
+      center: {x: -0.11992857, y: -0.024674922, z: 0.09130578}
+      size: {x: 1.045831, y: 0.45285922, z: 0.73698425}
   aproximationCount: 33
   normalSegmentPerUnit: 22
   colisionErrorFactor: 0.05
@@ -1068,7 +1068,7 @@ MonoBehaviour:
   angleBetween: 60
   drawGap: 0.1
   persistanceCount: 10
-  size: 0.5
+  size: 0.1
 --- !u!23 &1310649265
 MeshRenderer:
   m_ObjectHideFlags: 0

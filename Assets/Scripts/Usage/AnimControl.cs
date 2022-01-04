@@ -20,7 +20,7 @@ namespace Bizier.Examples {
                 if (t > currentT) {
                     tracable.position = pointData.Position;
                     //tracable.forward = pointData.Direction;
-                    tracable.up = pointData.NormalDir;
+                    tracable.up = pointData.Normal;
                     currentT = t;
                     animatorSlice.SetFloat(animFlatName, t);
                     Debug.Log($"t => {t}");

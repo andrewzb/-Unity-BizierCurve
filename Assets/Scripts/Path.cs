@@ -58,7 +58,6 @@ namespace Bizier {
         public float GetLength(int index) => lengths[index];
         public float GetLength(int index, int count) => lengths.GetRange(index, count).Sum();
 
-
         public CurvePointData GetCurvePointData(float t) {
             var index = GetCurvePointSegmentIndex(t, out var segmentT);
             var startRotation = GetAnchoreNormal(index);
@@ -66,18 +65,44 @@ namespace Bizier {
             var segmentPoints = GetSegmentPoints(index);
             var pos = BizierUtility.GetBuizierPoint(segmentPoints, segmentT);
             var forwardDir = BizierUtility.GetBuizierFirstDerivative(segmentPoints, segmentT);
-            var upPoint = pos + Vector3.up;
+            var upPoint = pos + transform.up;
             var upDistToPlane = MathHelper.GetDistanceToNormal(
                 forwardDir, pos, upPoint);
             var upPlanePoint = upPoint - forwardDir * upDistToPlane;
-            var uoPlaneDir = (upPlanePoint - pos).normalized;
-            var rightPlaneDir = (Quaternion.AngleAxis(90, forwardDir) * uoPlaneDir).normalized;
+
+            var upPlaneDir = (upPlanePoint - pos).normalized;
+
+            var rightPlaneDir = (Quaternion.AngleAxis(90, forwardDir) * upPlaneDir).normalized;
+
             var degre = Mathf.Lerp(startRotation, endRotation, t);
             var radAngle = Mathf.Deg2Rad * degre;
-            var normalDir = (pos + (uoPlaneDir * Mathf.Sin(radAngle))
+            var normalDir = (pos + (upPlaneDir * Mathf.Sin(radAngle))
                 + (rightPlaneDir * Mathf.Cos(radAngle))).normalized;
             var right = (rightPlaneDir * Mathf.Cos(radAngle)).normalized;
-            return new CurvePointData(pos, forwardDir, normalDir, right);
+            return new CurvePointData(pos, forwardDir, upPlaneDir, normalDir, Vector3.zero);
+        }
+
+        public CurvePointData GetCurvePointData(int index, float t) {
+            var startRotation = GetAnchoreNormal(index);
+            var endRotation = GetAnchoreNormal(index + 1);
+
+            var segmentPoints = GetSegmentPoints(index);
+
+            var pos = BizierUtility.GetBuizierPoint(segmentPoints, t);
+            var forwardDir = BizierUtility.GetBuizierFirstDerivative(segmentPoints, t);
+            var upPoint = pos + transform.up;
+            var upDistToPlane = MathHelper.GetDistanceToNormal(
+                forwardDir, pos, upPoint);
+
+            var upPlanePoint = upPoint - forwardDir * upDistToPlane;
+            var upPlaneDir = (upPlanePoint - pos).normalized;
+            var rightPlaneDir = (Quaternion.AngleAxis(90, forwardDir) * upPlaneDir).normalized;
+            var degre = Mathf.Lerp(startRotation, endRotation, t);
+            var radAngle = Mathf.Deg2Rad * degre;
+            var normalDir = (pos + (upPlaneDir * Mathf.Sin(radAngle))
+                + (rightPlaneDir * Mathf.Cos(radAngle))).normalized;
+            var right = (rightPlaneDir * Mathf.Cos(radAngle)).normalized;
+            return new CurvePointData(pos, forwardDir, upPlaneDir, normalDir, Vector3.zero);
         }
 
         public AnchoreTypes GetAnchoreType(int index) {
@@ -97,7 +122,8 @@ namespace Bizier {
         };
         }
 
-        public bool IsColide(int boundIndex, Vector3 point, CollisionErrorType collisionErrorType, float colisionErrorFactor = 1f) {
+        public bool IsColide(int boundIndex, Vector3 point, CollisionErrorType collisionErrorType,
+        float colisionErrorFactor = 1f) {
             return BizierUtility.GetIsColide(bounds[boundIndex], point, collisionErrorType, colisionErrorFactor);
         }
 
@@ -106,7 +132,7 @@ namespace Bizier {
             var length = Mathf.Lerp(0, curveLength, t);
             var index = 0;
             var segmentStartLength = 0f;
-            var count = lengths.Count + (isClosed ? 1 : +0);
+            var count = lengths.Count + (isClosed ? 1 : 0);
             for (int i = 0; i < count; i++) {
                 var currLength = lengths[LoopSegmentIndex(i)];
                 if (length >= segmentStartLength
@@ -121,7 +147,6 @@ namespace Bizier {
             return index;
         }
         
-
         public void UpdateOffset(Vector3 offset) {
             this.offset = offset;
         }
@@ -345,11 +370,13 @@ namespace Bizier {
                 lengths.Add(length);
             }
         }
+
         private void UpdateNormals() {
-            if (SegmentCount != normals.Count) {
+            var count = SegmentCount + (isClosed ? 0 : 1);
+            if (count != normals.Count) {
                 var localNormals = new List<float>();
                 var normalCount = normals.Count;
-                for (int i = 0; i < SegmentCount; i++) {
+                for (int i = 0; i < count; i++) {
                     if (i < normalCount) {
                         localNormals.Add(normals[i]);
                     } else {

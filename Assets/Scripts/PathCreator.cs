@@ -45,7 +45,8 @@ namespace Bizier {
         public CollisionErrorType CollisionErrorType => collisionErrorType;
         public bool IsClosed => path.IsClosed;
         public bool IsPath => path != null;
-
+        public float GetLength(int i) => path.GetLength(i);
+        public float GetLength(int i, int count) => path.GetLength(i, count);
 
         public void SetColisionErrorType(CollisionErrorType type) {
             collisionErrorType = type;
@@ -55,8 +56,8 @@ namespace Bizier {
             return path.GetCurvePointData(t);
         }
 
-        public float GetLength(int i) {
-            return path.GetLength(i);
+        public CurvePointData GetCurvePointData(int segment, float t) {
+            return path.GetCurvePointData(t);
         }
 
         public float SetNormalSegmentPerUnit(int i) {
@@ -253,6 +254,17 @@ namespace Bizier {
                 result.Add(point);
             }
 
+            return result;
+        }
+
+        public List<CurvePointData> GetBzizierPointsData(Vector3[] points, int segments) {
+            var result = new List<CurvePointData>();
+            var factor = 1f / segments;
+            for (int j = 0; j < segments; j++) {
+                var t = factor * j;
+                var point = path.GetCurvePointData(t);
+                result.Add(point);
+            }
             return result;
         }
     }

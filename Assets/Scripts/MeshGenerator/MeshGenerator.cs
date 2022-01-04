@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Bizier;
@@ -15,19 +14,9 @@ public class MeshGenerator : MonoBehaviour {
     [SerializeField] private int persistanceCount;
     [SerializeField] private float size;
 
-
-
-    /*
-    [SerializeField] private List<Vector3> path;
-    [SerializeField] private Vector3 upDirection;
-    [SerializeField] private Vector3 leftDirection;
-    [SerializeField] private float upDIst;
-    [SerializeField] private float sideDIst;
-    */
-
-
     private void FixedUpdate() {
-        var data = PathCreator.GetBzizierPointsData(t, drawGap, persistanceCount);
+        var data = PathCreator.GetBzizierPointsData(
+            t, drawGap, persistanceCount, PathCreator.IsClosed);
         meshFilter.mesh = Generate(data);
     }
 
@@ -36,19 +25,19 @@ public class MeshGenerator : MonoBehaviour {
         var points = new List<Vector3>();
         var tris = new List<int>();
         var uv = new List<Vector2>();
-        var angleRad = Mathf.Deg2Rad * angleBetween / 2;
+        var angleRad = Mathf.Deg2Rad * angleBetween;
         var cos = Mathf.Cos(angleRad);
         var sin = Mathf.Sin(angleRad);
         var fraction = 1f / (pathData.Count - 1);
+
         for (int i = 0; i < pathData.Count; i++) {
             var data = pathData[i];
-            var dir = data.Direction;
-            var up = data.NormalDir;
+            var up = data.Normal;
             var right = data.Right;
             var pp = data.Position;
             var p1 = pp + (up * sin + right * cos).normalized * size;
             var p2 = pp;
-            var p3 = pp + (up * cos + -right * sin).normalized * size;
+            var p3 = pp + (up * sin + -right * cos).normalized * size;
             points.AddTriplet(p1, p2, p3);
             var uvx = fraction * i;
             uv.AddTriplet(new Vector2(uvx, 1), new Vector2(uvx, 0.5f), new Vector2(uvx, 0));
@@ -74,12 +63,7 @@ public class MeshGenerator : MonoBehaviour {
 
         return res;
     }
-
-
 }
-
-
-
 
 public static class ListExtensions {
     public static void AddTriplet<T>(this List<T> list, T p1, T p2, T p3) {

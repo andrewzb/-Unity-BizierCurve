@@ -18,8 +18,8 @@ namespace Bizier.CustomEditorScripts {
         private bool isNeedUpdate;
 
         public override void OnInspectorGUI() {
-            EditorGUILayout.LabelField($"Curve stats: Segments => {pathCreater.SegmentCount}; " +
-                $"points => {pathCreater.PointsCount}");
+            EditorGUILayout.LabelField($"Curve stats: Segments => {pathCreater.SegmentCount}; "
+                + $"points => {pathCreater.PointsCount}");
 
             EditorGUILayout.Space(5, true);
             DrawInfo();
@@ -240,7 +240,7 @@ namespace Bizier.CustomEditorScripts {
 
         private void DrawAnchoreNumber() {
             if (pathCreater.curveSettings.IsDisplayAnchoreNumber) {
-                var style = new GUIStyle();
+                var style = new GUIStyle(); 
                 style.alignment = TextAnchor.MiddleCenter;
                 style.fontSize = displaySettings.anchoreNumberLabelSize;
                 style.normal.textColor = displaySettings.anchoreLabelNumber;
